@@ -2,17 +2,13 @@
 <html>
 <head>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js">	</script>
-	<script src="https://cdn.rawgit.com/json-editor/json-editor/master/dist/jsoneditor.min.js"></script>
+	<script src="https://cdn.rawgit.com/pszuster/OpenshiftTemplateEditor/master/jsoneditor.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css">
     <link rel="icon" type="image/png" href="https://www.google.com/s2/favicons?domain=openshift.com"/>
 	<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.css"/>
 	
-<!-- 	<script type="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js" ></script>
-	<script type="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.10.0/js-yaml.min.js"></script>
-	<script type="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/esprima/2.7.3/esprima.min.js"></script>
- -->
 <style type="text/css">
 .no-close .ui-dialog-titlebar-close {display: none }
 .ui-selectmenu-text {font-size: 15px}
@@ -35,10 +31,12 @@
     <br>
     <button id="loadFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-folder-open"></span>Load File</button>
     <button id="saveFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-folder-collapsed"></span>Save to  File</button>
-    
+    <button id="resetFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-trash"></span>Reset</button>
+    <div id="dialog-confirm" title="Reset the template?" hidden=true>
+	  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>The template will be permanently deleted and cannot be recovered. Are you sure?</p>
+	</div>
     <div id='editor_holder'></div>
       <input type="file" id="load-file" style="display:none;" />  
-    <!--  <button id='submit' class="ui-button ui-widget ui-corner-all" >Submit (console.log)</button>-->
     <script type="text/javascript">
 	 $( function() {
 		    $( "#valid_indicator" ).dialog({
@@ -63,7 +61,7 @@
     var editor;
 
     $(document).ready(function(){
-        	//var schemaVersion="3.6.0";
+        
         	var schemaVersion = document.getElementById("version").value;
 
         	$("#version").selectmenu({width: 100, change: function(event,ui){
@@ -78,10 +76,11 @@
 				JSONEditor.defaults.options.iconlib = 'jqueryui';
 				JSONEditor.defaults.editors.object.options.collapsed = true;
 				JSONEditor.defaults.editors.array.options.collapsed = true;
+
 				
 	            editor = new JSONEditor(document.getElementById('editor_holder'),{
 	               keep_oneof_values:false,
-	              display_required_only: true,
+	               display_required_only: true,
 	               schema: template
 	               
 	            });
@@ -115,6 +114,27 @@
 	            	var oMyBlob = new Blob(aFileParts, {type : 'application/json'}); // the blob
 	            	window.open(URL.createObjectURL(oMyBlob));
 	            });
+	            document.getElementById('resetFile').addEventListener('click',function(){
+		            resetTemplate()
+	            });
+
+	           function resetTemplate() {
+	                $( "#dialog-confirm" ).dialog({
+	                  resizable: false,
+	                  height: "auto",
+	                  width: 400,
+	                  modal: true,
+	                  buttons: {
+	                    "Reset": function() {
+		                  editor.setValue("");
+	                      $( this ).dialog( "close" );
+	                    },
+	                    Cancel: function() {
+	                      $( this ).dialog( "close" );
+	                    }
+	                  }
+	                });
+	              }
 
 
 	            editor.on('change',function() {
@@ -128,7 +148,8 @@
 
 		              var errorStr = "";
 		              errors.forEach(function(err){
-			              errorStr =errorStr + "<li>" + err.message + "(" + editor.getEditor(err.path.replace(/\.oneOf\[\d\]/g,"").substring(0,err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf("."))).header_text + err.path.replace(/\.oneOf\[\d\]/g,"").substring(err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf(".")) + ")</li>";
+			              if(!err.message.startsWith("Value must validate against") && !err.message.startsWith("Value must match the pattern") )
+			              	errorStr =errorStr + "<li>" + err.message + "(" + editor.getEditor(err.path.replace(/\.oneOf\[\d\]/g,"").substring(0,err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf("."))).header_text + err.path.replace(/\.oneOf\[\d\]/g,"").substring(err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf(".")) + ")</li>";
 			              });
 	                  indicator.style.color = 'red';
 	                  indicator.innerHTML = "Errors: <br><ul>" + errorStr + "</ul>" ;
@@ -139,6 +160,8 @@
 	                  indicator.textContent = "valid";
 	                }
 	              });
+
+	              
 	            
 			//});       	
         });
@@ -187,7 +210,7 @@
             	schema.properties.apiVersion.default = schema["x-kubernetes-group-version-kind"][0].Version;
             	schema.properties.metadata.required=["name"];
             	schema.properties.metadata.properties.name.type="string";
-            	oneOfStr.push({"title":schema.properties.kind.default, "type": "object", "properties": schema.properties, "description": schema.description, "required": ["kind","apiVersion","metadata"]});
+            	oneOfStr.push({"title":schema.properties.kind.default, "type": "object", "properties": schema.properties, "description": schema.description, "required": ["kind","apiVersion","metadata"], "options": {"multiple_editor_select_via_property": {"property": "kind", "value": schema["x-kubernetes-group-version-kind"][0].Kind }} });
             	});
         	
         	template.properties.objects.type="array";

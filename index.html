@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="https://www.google.com/s2/favicons?domain=openshift.com"/>
 	<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.css"/>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/yamljs/0.3.0/yaml.js"></script>
 	
 <style type="text/css">
 .no-close .ui-dialog-titlebar-close {display: none }
@@ -92,13 +93,13 @@
 	                           var reader = new FileReader();
 	                           reader.onload = function(e) {
 	                              
-	                          /*    if(fileInput[0].files[0].name.endsWith(".yaml")){
-		                              var yamlparser = require('https://cdnjs.cloudflare.com/ajax/libs/js-yaml/3.10.0/js-yaml.min.js');
-	                            	  editor.setValue(yamlparser.load(reader.result));
+	                              if( (fileInput[0].files[0].name.endsWith(".yaml")) || (fileInput[0].files[0].name.endsWith(".yml"))){
+
+		                              editor.setValue(YAML.parse(reader.result));
 		                              }
-	                              else{*/
+	                              else{
 	                               editor.setValue(JSON.parse(reader.result));
-	                          //    }
+	                             }
 	                           }
 
 	                           reader.readAsText(fileInput[0].files[0]);  

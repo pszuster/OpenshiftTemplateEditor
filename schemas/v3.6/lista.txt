@@ -1,7 +1,6 @@
 affinity.json
 all.json
 apiresource.json
-apiresourcelist.json
 apiversion.json
 apiversions.json
 appliedclusterresourcequota.json

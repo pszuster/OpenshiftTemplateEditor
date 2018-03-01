@@ -1,6 +1,5 @@
 affinity.json
 all.json
-apigroup.json
 apigrouplist.json
 apiresource.json
 apiresourcelist.json

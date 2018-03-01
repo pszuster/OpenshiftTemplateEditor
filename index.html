@@ -178,6 +178,8 @@
         var route="";
         var secret="";
         var sa="";
+        var pv="";
+        var pvc="";
         
         var templatePromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/template.json", function(data){ template = data;});
         var bcPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/buildconfig.json", function(data){ bc = data;});
@@ -188,10 +190,12 @@
         var routePromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/route.json", function(data){ route = data;});
         var secretPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/secret.json", function(data){ secret = data;});
         var saPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/serviceaccount.json", function(data){ sa = data;});
+        var pvPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/persistentvolume.json", function(data){ pv = data;});
+        var pvcPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/persistentvolumeclaim.json", function(data){ pvc = data;});
 
         	delete template.properties.objects.items.properties.Raw
 
-			var schemas = [service,cm,bc,dc,is,route, secret, sa];
+			var schemas = [service,cm,bc,dc,is,route, secret, sa,pv,pvc];
 
         	
         	template.properties.kind.type="string";

@@ -221,7 +221,6 @@ limitrangeitem.json
 limitrange.json
 limitrangelist.json
 limitrangespec.json
-lista.txt
 listmeta.json
 loadbalanceringress.json
 loadbalancerstatus.json

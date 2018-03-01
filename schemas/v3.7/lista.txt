@@ -1,8 +1,6 @@
 affinity.json
 all.json
 allowedflexvolume.json
-apigroup.json
-apigrouplist.json
 apiresource.json
 apiresourcelist.json
 apiversion.json
@@ -462,6 +460,5 @@ volume.json
 volumemount.json
 volumeprojection.json
 vspherevirtualdiskvolumesource.json
-watchevent.json
 webhooktrigger.json
 weightedpodaffinityterm.json

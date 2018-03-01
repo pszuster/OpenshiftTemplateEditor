@@ -462,6 +462,5 @@ volume.json
 volumemount.json
 volumeprojection.json
 vspherevirtualdiskvolumesource.json
-watchevent.json
 webhooktrigger.json
 weightedpodaffinityterm.json

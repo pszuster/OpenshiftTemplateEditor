@@ -25,8 +25,8 @@
     <label for="version" style="font-weight:800; ">OCP Version:</label>
     <select name="OCP Version" id="version">
     	<!--  <option value="1.5.1">3.5</option>-->
-    	<option selected="selected" value="3.6.0">3.6</option>
-    	<!--  <option value="3.7.0">3.7</option>-->
+    	<option selected="selected" value="3.6">3.6</option>
+    	  <option value="3.7">3.7</option>-
     </select>
     <br>
     <br>
@@ -62,8 +62,8 @@
     var editor;
 
     $(document).ready(function(){
-        
-        	var schemaVersion = document.getElementById("version").value;
+
+     	var schemaVersion = document.getElementById("version").value;
 
         	$("#version").selectmenu({width: 100, change: function(event,ui){
         		 	schemaVersion = event.target.value;
@@ -81,7 +81,7 @@
 				
 	            editor = new JSONEditor(document.getElementById('editor_holder'),{
 	               keep_oneof_values:false,
-	               display_required_only: true,
+	            //   display_required_only: true,
 	               schema: template
 	               
 	            });
@@ -170,7 +170,7 @@
 
     function getJsonSchemas(version){
     	var template="";
-        var bc="";
+ /*       var bc="";
         var dc ="";
         var is ="";
         var service ="";
@@ -180,8 +180,24 @@
         var sa="";
         var pv="";
         var pvc="";
+*/
+        var listaSchemasStr="";
+        var schemas = [];
+        $.get( "https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/lista.txt", function(data){listaSchemasStr = data;} );
+
+ 	   	listaSchemasStr.split(/\r?\n/).filter(Boolean).forEach(function(schemaFile) {
+ 	 	   $.getJSON("https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/" + schemaFile, function(data){ 
+ 	 	 	   if("x-kubernetes-group-version-kind" in data){	
+ 	 	 	   	   if(data["x-kubernetes-group-version-kind"][0].Kind == 'ProcessedTemplate' || data["x-kubernetes-group-version-kind"][0].kind == 'ProcessedTemplate')
+ 	 	 	 	   		template = data;
+ 	 	 	   	   else
+ 	 	 	   			schemas.push(data);
+ 	 	 	   }
+ 	 	 	   });
+ 	   });
+ 	    
         
-        var templatePromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/template.json", function(data){ template = data;});
+    /*    var templatePromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/template.json", function(data){ template = data;});
         var bcPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/buildconfig.json", function(data){ bc = data;});
         var dcPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/deploymentconfig.json", function(data){ dc = data;});
         var isPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/imagestream.json", function(data){ is = data;});;
@@ -197,6 +213,9 @@
 
 			var schemas = [service,cm,bc,dc,is,route, secret, sa,pv,pvc];
 
+        	*/
+
+        	delete template.properties.objects.items.properties.Raw
         	
         	template.properties.kind.type="string";
         	template.properties.kind.default="Template";
@@ -208,14 +227,24 @@
 
         	var oneOfStr=[];
         	schemas.forEach(function(schema){
+            	if(!("kind" in schema.properties))
+                	alert(JSON.stringify(schema));
         		schema.properties.kind.type="string";
         		schema.properties.apiVersion.type="string";
-            	schema.properties.kind.default = schema["x-kubernetes-group-version-kind"][0].Kind;
-            	schema.properties.kind.pattern = schema["x-kubernetes-group-version-kind"][0].Kind;
-            	schema.properties.apiVersion.default = schema["x-kubernetes-group-version-kind"][0].Version;
-            	schema.properties.metadata.required=["name"];
-            	schema.properties.metadata.properties.name.type="string";
-            	oneOfStr.push({"title":schema.properties.kind.default, "type": "object", "properties": schema.properties, "description": schema.description, "required": ["kind","apiVersion","metadata"], "options": {"multiple_editor_select_via_property": {"property": "kind", "value": schema["x-kubernetes-group-version-kind"][0].Kind }} });
+        		var schemaKind = schema["x-kubernetes-group-version-kind"][0].Kind || schema["x-kubernetes-group-version-kind"][0].kind;
+            	schema.properties.kind.default = schemaKind;
+            	schema.properties.kind.pattern = schemaKind;
+            	schema.properties.apiVersion.default = schema["x-kubernetes-group-version-kind"][0].Version || schema["x-kubernetes-group-version-kind"][0].version;
+				if(!("metadata" in schema.properties)){
+					schema.properties.metadata = {};	
+					schema.properties.metadata.properties={};	
+				}
+				if(!("name" in schema.properties.metadata.properties)){
+        			schema.properties.metadata.properties.name={};
+        		}
+				schema.properties.metadata.properties.name.type="string";
+    			schema.properties.metadata.required=["name"];
+            	oneOfStr.push({"title":schema.properties.kind.default, "type": "object", "properties": schema.properties, "description": schema.description, "required": ["kind","apiVersion","metadata"], "options": {"multiple_editor_select_via_property": {"property": "kind", "value": schemaKind }} });
             	});
         	
         	template.properties.objects.type="array";

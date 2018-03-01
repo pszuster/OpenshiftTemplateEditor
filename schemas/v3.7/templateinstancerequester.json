@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/schema#", 
+  "type": "object", 
+  "description": "TemplateInstanceRequester holds the identity of an agent requesting a template instantiation.", 
+  "properties": {
+    "username": {
+      "type": "string", 
+      "description": "username uniquely identifies this user among all active users."
+    }, 
+    "uid": {
+      "type": "string", 
+      "description": "uid is a unique value that identifies this user across time; if this user is deleted and another user by the same name is added, they will have different UIDs."
+    }, 
+    "groups": {
+      "items": {
+        "type": "string"
+      }, 
+      "type": "array", 
+      "description": "groups represent the groups this user is a part of."
+    }, 
+    "extra": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        }, 
+        "type": "array"
+      }, 
+      "type": "object", 
+      "description": "extra holds additional information provided by the authenticator."
+    }
+  }
+}

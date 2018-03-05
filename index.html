@@ -14,33 +14,31 @@
 .no-close .ui-dialog-titlebar-close {display: none }
 .ui-selectmenu-text {font-size: 15px}
 </style>
+ <style>
+  #progressbar {
+    margin-top: 20px;
+  }
+ 
+  .progress-label {
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+  }
+ 
+  .ui-dialog-titlebar-close {
+    display: none;
+  }
+  </style>
 <meta charset="UTF-8">
 <title>Openshift Template Editor</title>
-</head>
-<body>
-<h1><img alt="Openshift" src="https://www.openshift.com/images/logos/openshift/Logotype_RH_OpenShift_wLogo_RGB_Gray.png" height="60px"><font color="darkgrey" face="verdana"> Template Editor</font></h1>
-	<pre>
-    <div id="valid_indicator" title="Validation"/>
-    </pre>
-    <label for="version" style="font-weight:800; ">OCP Version:</label>
-    <select name="OCP Version" id="version">
-    	<!--  <option value="1.5.1">3.5</option>-->
-    	<option selected="selected" value="3.6">3.6</option>
-    	  <option value="3.7">3.7</option>-
-    </select>
-    <br>
-    <br>
-    <button id="loadFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-folder-open"></span>Load File</button>
-    <button id="saveFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-folder-collapsed"></span>Save to  File</button>
-    <button id="resetFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-trash"></span>Reset</button>
-    <div id="dialog-confirm" title="Reset the template?" hidden=true>
-	  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>The template will be permanently deleted and cannot be recovered. Are you sure?</p>
-	</div>
-    <div id='editor_holder'></div>
-      <input type="file" id="load-file" style="display:none;" />  
-    <script type="text/javascript">
-	 $( function() {
-		    $( "#valid_indicator" ).dialog({
+    <script>
+    $.ajaxSetup({
+        async: false
+    });
+
+    var editor;
+
+$(function(){
+        		 	    $( "#valid_indicator" ).dialog({
 			    	maxWidth: 800,
 			    	maxHeight: 800,
 			    	width: 500,
@@ -52,20 +50,9 @@
 			            $(event.target).parent().css({ 'position': 'fixed', "right": 50, "top": 150 });
 			          }
 			    });
-		  } );
-    </script>
-    <script>
-    $.ajaxSetup({
-        async: false
-    });
-
-    var editor;
-
-    $(document).ready(function(){
-
-     	var schemaVersion = document.getElementById("version").value;
-
+     		var schemaVersion = document.getElementById("version").value;
         	$("#version").selectmenu({width: 100, change: function(event,ui){
+        		
         		 	schemaVersion = event.target.value;
             		template = getJsonSchemas(schemaVersion);
             		editor.schema = template;
@@ -164,12 +151,16 @@
 
 	              
 	            
-			//});       	
-        });
-
+			       	
+     
 
     function getJsonSchemas(version){
     	var template="";
+
+    	
+    	
+    	
+         
  /*       var bc="";
         var dc ="";
         var is ="";
@@ -181,12 +172,17 @@
         var pv="";
         var pvc="";
 */
+
         var listaSchemasStr="";
         var schemas = [];
-        $.get( "https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/lista.txt", function(data){listaSchemasStr = data;} );
+        $.get("https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/lista.txt",function(data){listaSchemasStr=data});
 
- 	   	listaSchemasStr.split(/\r?\n/).filter(Boolean).forEach(function(schemaFile) {
- 	 	   $.getJSON("https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/" + schemaFile, function(data){ 
+		var schemalist = listaSchemasStr.split(/\r?\n/).filter(Boolean);
+		var i=0;
+		schemalist.forEach(function(schemaFile) {
+ 	 	   $.getJSON("https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/" + schemaFile, function(data){
+ 	 	 	   i++;
+ 	 		// $( "#progressbar" ).progressbar({value: (i/schemalist.length)*100}); 
  	 	 	   if("x-kubernetes-group-version-kind" in data){	
  	 	 	   	   if(data["x-kubernetes-group-version-kind"][0].Kind == 'ProcessedTemplate' || data["x-kubernetes-group-version-kind"][0].kind == 'ProcessedTemplate')
  	 	 	 	   		template = data;
@@ -195,7 +191,8 @@
  	 	 	   }
  	 	 	   });
  	   });
- 	    
+
+ 	   
         
     /*    var templatePromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/template.json", function(data){ template = data;});
         var bcPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/buildconfig.json", function(data){ bc = data;});
@@ -227,8 +224,7 @@
 
         	var oneOfStr=[];
         	schemas.forEach(function(schema){
-            	if(!("kind" in schema.properties))
-                	alert(JSON.stringify(schema));
+
         		schema.properties.kind.type="string";
         		schema.properties.apiVersion.type="string";
         		var schemaKind = schema["x-kubernetes-group-version-kind"][0].Kind || schema["x-kubernetes-group-version-kind"][0].kind;
@@ -253,10 +249,39 @@
 			template.properties.parameters.items.headerTemplate= "{{ i1 }} - {{ self.name }}";
 			template.properties.objects.items.headerTemplate= "{{ i1 }} - {{ self.kind}} - {{ self.metadata.name }}";
 
+		
         return template;
     }
     
+});
 
     </script>
+</head>
+<body>
+<h1><img alt="Openshift" src="https://www.openshift.com/images/logos/openshift/Logotype_RH_OpenShift_wLogo_RGB_Gray.png" height="60px"><font color="darkgrey" face="verdana"> Template Editor</font></h1>
+	<pre>
+    <div id="valid_indicator" title="Validation"/>
+    </pre>
+    <label for="version" style="font-weight:800; ">OCP Version:</label>
+    <select name="OCP Version" id="version">
+    	<!--  <option value="1.5.1">3.5</option>-->
+    	<option selected="selected" value="3.6">3.6</option>
+    	  <option value="3.7">3.7</option>-
+    </select>
+    <br>
+    <br>
+    <button id="loadFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-folder-open"></span>Load File</button>
+    <button id="saveFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-folder-collapsed"></span>Save to  File</button>
+    <button id="resetFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-trash"></span>Reset</button>
+    <div id="dialog-confirm" title="Reset the template?" hidden=true>
+	  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>The template will be permanently deleted and cannot be recovered. Are you sure?</p>
+	</div>
+    <div id='editor_holder'></div>
+      <input type="file" id="load-file" style="display:none;" />  
+      
+   <!--<div id="downloadDialog" title="File Download">
+  		<div class="progress-label">Starting Schema download...</div>  
+  		<div id="progressbar"></div>
+	 </div> -->
 </body>
 </html>

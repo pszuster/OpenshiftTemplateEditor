@@ -16,4 +16,4 @@ You can import json or yaml templates, modify them and export them as json. The 
 |**Editing Services** ![Edit Service](images/Selection_022.png)|
 |**Editing ConfigMaps**![Edit ConfigMap](images/Selection_023.png)
 |**Writing JSON directly <br>** ![Edit json directly](images/Selection_024.png)|
-|** Template Validation** ![Validation](images/Selection_025.png)|
+|**Template Validation** ![Validation](images/Selection_025.png)|

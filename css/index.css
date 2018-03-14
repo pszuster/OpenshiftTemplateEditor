@@ -1,0 +1,12 @@
+#progressbar {
+    margin-top: 20px;
+}
+.progress-label {
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+}
+.ui-dialog-titlebar-close {
+    display: none;
+}
+.no-close .ui-dialog-titlebar-close {display: none }
+.ui-selectmenu-text {font-size: 15px}

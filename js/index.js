@@ -20,9 +20,9 @@ $(function(){
 
     var schemaVersion = $("#version").val();
     $("#version").selectmenu({width: 100, change: function(event,ui){
-        schemaVersion = event.target.value;
-        template = getJsonSchemas(schemaVersion);
-        editor.schema = template;
+            schemaVersion = event.target.value;
+            template = getJsonSchemas(schemaVersion);
+            editor.schema = template;
         }
     });
         
@@ -32,13 +32,13 @@ $(function(){
     JSONEditor.defaults.editors.object.options.collapsed = true;
     JSONEditor.defaults.editors.array.options.collapsed = true;
         
-    editor = new JSONEditor($("#editor_holder"),{
+    editor = new JSONEditor($("#editor_holder")[0],{
         keep_oneof_values:false,
         // display_required_only: true,
         schema: template
     });
             
-    $("#loadFile").addEventListener('click',function(){
+    $("#loadFile").click(function(){
         if (window.FileReader) {
             var fileInput = $('#load-file');
             fileInput.change(function(e) {
@@ -58,13 +58,13 @@ $(function(){
         }
     });
 
-    $("#saveFile").addEventListener('click',function(){
+    $("#saveFile").click(function(){
         var aFileParts = [JSON.stringify(editor.getValue())];
         var oMyBlob = new Blob(aFileParts, {type : 'application/json'}); // the blob
         window.open(URL.createObjectURL(oMyBlob));
     });
             
-    $("#resetFile").addEventListener('click',function(){
+    $("#resetFile").click(function(){
         resetTemplate()
     });
 
@@ -98,13 +98,13 @@ $(function(){
                 if(!err.message.startsWith("Value must validate against") && !err.message.startsWith("Value must match the pattern") )
                     errorStr =errorStr + "<li>" + err.message + "(" + editor.getEditor(err.path.replace(/\.oneOf\[\d\]/g,"").substring(0,err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf("."))).header_text + err.path.replace(/\.oneOf\[\d\]/g,"").substring(err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf(".")) + ")</li>";
                 });
-            indicator.style.color = 'red';
-            indicator.innerHTML = "Errors: <br><ul>" + errorStr + "</ul>" ;
+            indicator.css("color", "red");
+            indicator.val("Errors: <br><ul>" + errorStr + "</ul>");
         }
         // Valid
         else {
-            indicator.style.color = 'green';
-            indicator.textContent = "valid";
+            indicator.css("color", "green");
+            indicator.val("valid");
         }
     });
 
@@ -125,7 +125,9 @@ $(function(){
 
         var listaSchemasStr="";
         var schemas = [];
-        var listFilesURL = "https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/lista.txt";
+        var baseURL = window.location.protocol + "//" + window.location.host;
+        // var listFilesURL = "https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/lista.txt";
+        var listFilesURL = baseURL + "/schemas/v" + version + "/lista.txt";
         
         $.get(listFilesURL, function(data){
             listaSchemasStr = data 
@@ -134,7 +136,7 @@ $(function(){
         var schemalist = listaSchemasStr.split(/\r?\n/).filter(Boolean);
         var i=0;
         schemalist.forEach(function(schemaFile) {
-            var schemaURL = "https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/" + schemaFile;
+            var schemaURL = baseURL + "/schemas/v" + version + "/" + schemaFile;
             $.getJSON(schemaURL, function(data){
                 i++;
                 // $( "#progressbar" ).progressbar({value: (i/schemalist.length)*100}); 
@@ -144,7 +146,7 @@ $(function(){
                     else
                         schemas.push(data);
                 }
-                });
+            });
         });
 
 /*  var templatePromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/template.json", function(data){ template = data;});
@@ -165,6 +167,7 @@ $(function(){
     */
 
         delete template.properties.objects.items.properties.Raw
+
         template.properties.kind.type="string";
         template.properties.kind.default="Template";
         template.properties.apiVersion.type="string";

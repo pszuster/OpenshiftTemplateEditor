@@ -12,13 +12,13 @@ $(function(){
         height: 200,
         closeOnEscape: false,
         position: {my: "right top", at: "right top", of: window},
-        dialogClass: 'no-close',
+        dialogClass: "no-close",
         create: function (event) {
-            $(event.target).parent().css({ 'position': 'fixed', "right": 50, "top": 150 });
+            $(event.target).parent().css({ "position": "fixed", "right": 50, "top": 150 });
         }
     });
 
-    var schemaVersion = document.getElementById("version").value;
+    var schemaVersion = $("#version").val();
     $("#version").selectmenu({width: 100, change: function(event,ui){
         schemaVersion = event.target.value;
         template = getJsonSchemas(schemaVersion);
@@ -32,13 +32,13 @@ $(function(){
     JSONEditor.defaults.editors.object.options.collapsed = true;
     JSONEditor.defaults.editors.array.options.collapsed = true;
         
-    editor = new JSONEditor(document.getElementById('editor_holder'),{
+    editor = new JSONEditor($("#editor_holder"),{
         keep_oneof_values:false,
         // display_required_only: true,
         schema: template
     });
             
-    document.getElementById('loadFile').addEventListener('click',function(){
+    $("#loadFile").addEventListener('click',function(){
         if (window.FileReader) {
             var fileInput = $('#load-file');
             fileInput.change(function(e) {
@@ -58,13 +58,13 @@ $(function(){
         }
     });
 
-    document.getElementById('saveFile').addEventListener('click',function(){
+    $("#saveFile").addEventListener('click',function(){
         var aFileParts = [JSON.stringify(editor.getValue())];
         var oMyBlob = new Blob(aFileParts, {type : 'application/json'}); // the blob
         window.open(URL.createObjectURL(oMyBlob));
     });
             
-    document.getElementById('resetFile').addEventListener('click',function(){
+    $("#resetFile").addEventListener('click',function(){
         resetTemplate()
     });
 
@@ -86,10 +86,10 @@ $(function(){
         });
     }
 
-    editor.on('change',function() {
+    editor.on("change",function() {
         // Get an array of errors from the validator
         var errors = editor.validate();
-        var indicator = document.getElementById('valid_indicator');
+        var indicator = $("#valid_indicator");
         
         // Not valid
         if(errors.length) {
@@ -125,12 +125,17 @@ $(function(){
 
         var listaSchemasStr="";
         var schemas = [];
-        $.get("https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/lista.txt",function(data){listaSchemasStr=data});
+        var listFilesURL = "https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/lista.txt";
+        
+        $.get(listFilesURL, function(data){
+            listaSchemasStr = data 
+        });
 
         var schemalist = listaSchemasStr.split(/\r?\n/).filter(Boolean);
         var i=0;
         schemalist.forEach(function(schemaFile) {
-            $.getJSON("https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/" + schemaFile, function(data){
+            var schemaURL = "https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/" + schemaFile;
+            $.getJSON(schemaURL, function(data){
                 i++;
                 // $( "#progressbar" ).progressbar({value: (i/schemalist.length)*100}); 
                 if("x-kubernetes-group-version-kind" in data){	

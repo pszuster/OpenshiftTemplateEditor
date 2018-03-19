@@ -1,3 +1,11 @@
+#controls{ 
+    margin-top: 15px;
+}
+
+#version{
+    max-width:90%;
+}
+
 #progressbar {
     margin-top: 20px;
 }
@@ -9,4 +17,12 @@
     display: none;
 }
 .no-close .ui-dialog-titlebar-close {display: none }
-.ui-selectmenu-text {font-size: 15px}
+.ui-selectmenu-text { font-size: 15px }
+
+#load-file {
+    display:none;
+}
+
+#dialog-confirm {
+    display: none;
+}

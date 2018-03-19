@@ -5,6 +5,12 @@ $.ajaxSetup({
 var editor;
 
 $(function(){
+
+    JSONEditor.defaults.options.theme = 'jqueryui';
+    JSONEditor.defaults.options.iconlib = 'jqueryui';
+    JSONEditor.defaults.editors.object.options.collapsed = true;
+    JSONEditor.defaults.editors.array.options.collapsed = true;
+
     $( "#valid_indicator" ).dialog({
         maxWidth: 800,
         maxHeight: 800,
@@ -18,25 +24,48 @@ $(function(){
         }
     });
 
-    var schemaVersion = $("#version").val();
     $("#version").selectmenu({width: 100, change: function(event,ui){
-            schemaVersion = event.target.value;
+        schemaVersion = event.target.value;
+        if (schemaVersion != ""){ 
+            $("#progress").removeClass("hide");
             template = getJsonSchemas(schemaVersion);
-            editor.schema = template;
+            if (editor){
+                editor.template = template;
+            }else {
+                editor = new JSONEditor($("#editor_holder")[0],{
+                    keep_oneof_values:false,
+                    // display_required_only: true,
+                    schema: template
+                });
+                initEditor(editor);
+                $("#controls").removeClass("hide");
+            }
         }
-    });
-        
-    var template = getJsonSchemas(schemaVersion);
-    JSONEditor.defaults.options.theme = 'jqueryui';
-    JSONEditor.defaults.options.iconlib = 'jqueryui';
-    JSONEditor.defaults.editors.object.options.collapsed = true;
-    JSONEditor.defaults.editors.array.options.collapsed = true;
-        
-    editor = new JSONEditor($("#editor_holder")[0],{
-        keep_oneof_values:false,
-        // display_required_only: true,
-        schema: template
-    });
+    }});
+ 
+    function initEditor(editor){       
+        editor.on("change",function() {
+            // Get an array of errors from the validator
+            var errors = editor.validate();
+            var indicator = $("#valid_indicator");
+            
+            // Not valid
+            if(errors.length) {
+                var errorStr = "";
+                errors.forEach(function(err){
+                    if(!err.message.startsWith("Value must validate against") && !err.message.startsWith("Value must match the pattern") )
+                        errorStr =errorStr + "<li>" + err.message + "(" + editor.getEditor(err.path.replace(/\.oneOf\[\d\]/g,"").substring(0,err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf("."))).header_text + err.path.replace(/\.oneOf\[\d\]/g,"").substring(err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf(".")) + ")</li>";
+                    });
+                indicator.css("color", "red");
+                indicator.val("Errors: <br><ul>" + errorStr + "</ul>");
+            }
+            // Valid
+            else {
+                indicator.css("color", "green");
+                indicator.val("valid");
+            }
+        });
+    }
             
     $("#loadFile").click(function(){
         if (window.FileReader) {
@@ -65,7 +94,7 @@ $(function(){
     });
             
     $("#resetFile").click(function(){
-        resetTemplate()
+        resetTemplate();
     });
 
     function resetTemplate() {
@@ -86,47 +115,11 @@ $(function(){
         });
     }
 
-    editor.on("change",function() {
-        // Get an array of errors from the validator
-        var errors = editor.validate();
-        var indicator = $("#valid_indicator");
-        
-        // Not valid
-        if(errors.length) {
-            var errorStr = "";
-            errors.forEach(function(err){
-                if(!err.message.startsWith("Value must validate against") && !err.message.startsWith("Value must match the pattern") )
-                    errorStr =errorStr + "<li>" + err.message + "(" + editor.getEditor(err.path.replace(/\.oneOf\[\d\]/g,"").substring(0,err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf("."))).header_text + err.path.replace(/\.oneOf\[\d\]/g,"").substring(err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf(".")) + ")</li>";
-                });
-            indicator.css("color", "red");
-            indicator.val("Errors: <br><ul>" + errorStr + "</ul>");
-        }
-        // Valid
-        else {
-            indicator.css("color", "green");
-            indicator.val("valid");
-        }
-    });
-
     function getJsonSchemas(version){
         var template="";
-
-    /*  var bc="";
-        var dc ="";
-        var is ="";
-        var service ="";
-        var cm ="";
-        var route="";
-        var secret="";
-        var sa="";
-        var pv="";
-        var pvc="";
-    */
-
         var listaSchemasStr="";
         var schemas = [];
         var baseURL = window.location.protocol + "//" + window.location.host;
-        // var listFilesURL = "https://raw.githubusercontent.com/pszuster/OpenshiftTemplateEditor/master/schemas/v" + version + "/lista.txt";
         var listFilesURL = baseURL + "/schemas/v" + version + "/lista.txt";
         
         $.get(listFilesURL, function(data){
@@ -134,12 +127,11 @@ $(function(){
         });
 
         var schemalist = listaSchemasStr.split(/\r?\n/).filter(Boolean);
-        var i=0;
+        var i=0;        
         schemalist.forEach(function(schemaFile) {
             var schemaURL = baseURL + "/schemas/v" + version + "/" + schemaFile;
             $.getJSON(schemaURL, function(data){
                 i++;
-                // $( "#progressbar" ).progressbar({value: (i/schemalist.length)*100}); 
                 if("x-kubernetes-group-version-kind" in data){	
                     if(data["x-kubernetes-group-version-kind"][0].Kind == 'ProcessedTemplate' || data["x-kubernetes-group-version-kind"][0].kind == 'ProcessedTemplate')
                         template = data;
@@ -147,26 +139,11 @@ $(function(){
                         schemas.push(data);
                 }
             });
+            if (i == schemalist.length)
+                $("#progress").addClass("hide");    
         });
 
-/*  var templatePromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/template.json", function(data){ template = data;});
-    var bcPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/buildconfig.json", function(data){ bc = data;});
-    var dcPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/deploymentconfig.json", function(data){ dc = data;});
-    var isPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/imagestream.json", function(data){ is = data;});;
-    var servicePromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/service.json", function(data){ service = data;});
-    var cmPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/configmap.json", function(data){ cm = data;});
-    var routePromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/route.json", function(data){ route = data;});
-    var secretPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/secret.json", function(data){ secret = data;});
-    var saPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/serviceaccount.json", function(data){ sa = data;});
-    var pvPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/persistentvolume.json", function(data){ pv = data;});
-    var pvcPromise=$.getJSON("https://raw.githubusercontent.com/garethr/openshift-json-schema/master/v" + version + "-standalone/persistentvolumeclaim.json", function(data){ pvc = data;});
-
-    delete template.properties.objects.items.properties.Raw
-
-    var schemas = [service,cm,bc,dc,is,route, secret, sa,pv,pvc];
-    */
-
-        delete template.properties.objects.items.properties.Raw
+        delete template.properties.objects.items.properties.Raw;
 
         template.properties.kind.type="string";
         template.properties.kind.default="Template";

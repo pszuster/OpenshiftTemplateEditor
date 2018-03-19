@@ -1,48 +1,83 @@
 <html>
 <head>
-	<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js">	</script>
-	<script src="https://cdn.rawgit.com/pszuster/OpenshiftTemplateEditor/master/jsoneditor.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css">
     <link rel="icon" type="image/png" href="https://www.google.com/s2/favicons?domain=openshift.com"/>
-	<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/cupertino/jquery-ui.css"/>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/yamljs/0.3.0/yaml.js"></script>
+	<link rel="stylesheet" href="css/patternfly/patternfly.min.css"/>
+	<link rel="stylesheet" href="css/patternfly/patternfly-additions.min.css"/>
 	<link rel="stylesheet" href="css/index.css"/>
-
-	<meta charset="UTF-8">
+	<meta charset="UTF-8" />
 	<title>Openshift Template Editor</title>
 </head>
 
 <body>
-	<h1>
-		<img alt="Openshift" src="https://www.openshift.com/images/logos/openshift/Logotype_RH_OpenShift_wLogo_RGB_Gray.png" height="60px">
-		<font color="darkgrey" face="verdana"> Template Editor</font>
-	</h1>
-	<pre>
-    	<div id="valid_indicator" title="Validation"/>
-    </pre>
-    <label for="version" style="font-weight:800; ">OCP Version:</label>
-    <select name="OCP Version" id="version">
-    	<!--  <option value="1.5.1">3.5</option>-->
-    	<option selected="selected" value="3.6">3.6</option>
-		<option value="3.7">3.7</option>-
-    </select>
-    <br>
-    <br>
-    <button id="loadFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-folder-open"></span>Load File</button>
-    <button id="saveFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-folder-collapsed"></span>Save to  File</button>
-    <button id="resetFile" class="ui-button ui-widget ui-corner-all" style="font-size: 11px"><span class="ui-icon  ui-icon-trash"></span>Reset</button>
-    <div id="dialog-confirm" title="Reset the template?" hidden=true>
-	  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>The template will be permanently deleted and cannot be recovered. Are you sure?</p>
-	</div>
-    <div id='editor_holder' />
-	<input type="file" id="load-file" style="display:none;" />  
-      
-   <!--<div id="downloadDialog" title="File Download">
-  		<div class="progress-label">Starting Schema download...</div>  
-  		<div id="progressbar"></div>
-	 </div> -->
-	 <script src="js/index.js"></script>
+	<nav class="navbar navbar-default navbar-pf" role="navigation">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse-1">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/">
+				<p> Openshift Template Editor </p>
+			</a>
+		</div>
+		<div class="collapse navbar-collapse navbar-collapse-1">
+			<ul class="nav navbar-nav navbar-primary">
+				<li >
+					<a href="/">Editor</a>
+				</li>
+				<li>
+					<a href="/help.html">Help ?</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+	  
+	<div class="container-fluid">
+		<div class="card-pf-body"> 
+			<div id="valid_indicator" title="Validation"></div>
+			<div>
+				<label for="version">OCP Version:</label>
+				<select name="OCP Version" id="version">
+					<option value="" selected>Select Openshift Version</option>
+					<option value="3.6">3.6</option>
+					<option value="3.7">3.7</option>
+				</select>
+			</div>
+			<div id="controls" class="hide">
+				<button id="loadFile" class="ui-button ui-widget ui-corner-all ">
+					<span class="ui-icon  ui-icon-folder-open"></span>
+					Load File
+				</button>
+				<button id="saveFile" class="ui-button ui-widget ui-corner-all ">
+					<span class="ui-icon  ui-icon-folder-collapsed"></span>
+					Save to  File
+				</button>
+				<button id="resetFile" class="ui-button ui-widget ui-corner-all ">
+					<span class="ui-icon  ui-icon-trash"></span>
+					Reset
+				</button>
+				<div id="dialog-confirm" class="hide" title="Reset the template?">
+					<p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>The template will be permanently deleted and cannot be recovered. Are you sure?</p>
+				</div>
+				<div id='editor_holder'></div>
+				<input type="file" id="load-file" />
+			</div> 
+			
+			<div id="progress" class="progress-description hide">
+				<div class="spinner spinner-xs spinner-inline"></div> <strong>Downloading:</strong>  Schemas
+			</div>
+		</div> 
+	</div><!-- container -->
+
+	<script type="text/javascript" src="http://code.jquery.com/jquery-3.3.1.min.js"></script>	
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js"></script>
+	<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/yamljs/0.3.0/yaml.js"></script>
+	<script type="text/javascript" src="js/thirdparty/bootstrap.min.js"></script>
+	<script type="text/javascript" src="js/thirdparty/jsoneditor.js"></script>
+	<script type="text/javascript" src="js/index.js"></script>
 </body>
 </html>

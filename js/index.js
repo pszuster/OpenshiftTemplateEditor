@@ -25,21 +25,26 @@ $(function(){
     });
 
     $("#version").change(function(){
-        schemaVersion = $(this).val();
-        if (schemaVersion != ""){ 
-            template = getJsonSchemas(schemaVersion);
-            if (editor){
-                editor.template = template;
-            }else {
-                editor = new JSONEditor($("#editor_holder")[0],{
-                    keep_oneof_values:false,
-                    // display_required_only: true,
-                    schema: template
-                });
-                initEditor(editor);
-                $("#controls").removeClass("hide");
+        var parentThis = this;
+        $("#loading").show(function(){
+            schemaVersion = $(parentThis).val();
+            if (schemaVersion != ""){ 
+                template = getJsonSchemas(schemaVersion);
+                if (editor){
+                    editor.template = template;
+                }else {
+                    editor = new JSONEditor($("#editor_holder")[0],{
+                        keep_oneof_values:false,
+                        // display_required_only: true,
+                        schema: template
+                    });
+                    initEditor(editor);
+                    $("#controls").show();
+                    $("#loading").hide();
+                }
             }
-        }
+        });
+        
     });
  
     function initEditor(editor){       

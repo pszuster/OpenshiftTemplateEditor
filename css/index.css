@@ -1,5 +1,6 @@
 #controls{ 
     margin-top: 15px;
+    display: none;
 }
 
 #version{
@@ -24,5 +25,9 @@
 }
 
 #dialog-confirm {
+    display: none;
+}
+
+#loading {
     display: none;
 }

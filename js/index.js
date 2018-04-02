@@ -6,8 +6,8 @@ var editor;
 
 $(function(){
 
-    JSONEditor.defaults.options.theme = 'jqueryui';
-    JSONEditor.defaults.options.iconlib = 'jqueryui';
+    JSONEditor.defaults.options.theme = 'bootstrap3';
+    JSONEditor.defaults.options.iconlib = "bootstrap3";
     JSONEditor.defaults.editors.object.options.collapsed = true;
     JSONEditor.defaults.editors.array.options.collapsed = true;
 
@@ -24,10 +24,9 @@ $(function(){
         }
     });
 
-    $("#version").selectmenu({width: 100, change: function(event,ui){
-        schemaVersion = event.target.value;
+    $("#version").change(function(){
+        schemaVersion = $(this).val();
         if (schemaVersion != ""){ 
-            $("#progress").removeClass("hide");
             template = getJsonSchemas(schemaVersion);
             if (editor){
                 editor.template = template;
@@ -41,7 +40,7 @@ $(function(){
                 $("#controls").removeClass("hide");
             }
         }
-    }});
+    });
  
     function initEditor(editor){       
         editor.on("change",function() {
@@ -127,11 +126,9 @@ $(function(){
         });
 
         var schemalist = listaSchemasStr.split(/\r?\n/).filter(Boolean);
-        var i=0;        
         schemalist.forEach(function(schemaFile) {
             var schemaURL = baseURL + "/schemas/v" + version + "/" + schemaFile;
             $.getJSON(schemaURL, function(data){
-                i++;
                 if("x-kubernetes-group-version-kind" in data){	
                     if(data["x-kubernetes-group-version-kind"][0].Kind == 'ProcessedTemplate' || data["x-kubernetes-group-version-kind"][0].kind == 'ProcessedTemplate')
                         template = data;
@@ -139,8 +136,6 @@ $(function(){
                         schemas.push(data);
                 }
             });
-            if (i == schemalist.length)
-                $("#progress").addClass("hide");    
         });
 
         delete template.properties.objects.items.properties.Raw;

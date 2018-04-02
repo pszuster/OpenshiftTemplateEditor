@@ -16,11 +16,19 @@ $(function(){
         maxHeight: 800,
         width: 500,
         height: 200,
+        top: 149,
         closeOnEscape: false,
-        position: {my: "right top", at: "right top", of: window},
         dialogClass: "no-close",
         create: function (event) {
-            $(event.target).parent().css({ "position": "fixed", "right": 50, "top": 300 });
+            $(event.target).parent().css(
+                { 
+                    "position": "fixed", 
+                    "right": 50, 
+                    "top": 149,
+                    "height": "auto",
+                    "left": 651
+                }
+            );
         }
     });
 

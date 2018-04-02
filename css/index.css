@@ -31,3 +31,17 @@
 #loading {
     display: none;
 }
+
+button.btn.btn-default.json-editor-btn-delete.delete {
+    margin: 0 15px;
+}
+
+.well-sm .btn-group{
+    padding-bottom: 10px;
+
+}
+
+button.btn.btn-default {
+    margin-right: 10px;
+    /* padding-right: 10px; */
+}

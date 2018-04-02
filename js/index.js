@@ -11,26 +11,20 @@ $(function(){
     JSONEditor.defaults.editors.object.options.collapsed = true;
     JSONEditor.defaults.editors.array.options.collapsed = true;
 
-    $( "#valid_indicator" ).dialog({
+    $('.panel-floating').lobiPanel({
+        reload: false,
+        close: false,
+        draggable: true,
+        editTitle: false,
+        minWidth: 500,
         maxWidth: 800,
         maxHeight: 800,
-        width: 500,
-        height: 200,
-        top: 149,
-        closeOnEscape: false,
-        dialogClass: "no-close",
-        create: function (event) {
-            $(event.target).parent().css(
-                { 
-                    "position": "fixed", 
-                    "right": 50, 
-                    "top": 149,
-                    "height": "auto",
-                    "left": 651
-                }
-            );
-        }
+        minHeight: 200
     });
+
+    var panel = $('.panel-floating').data('lobiPanel');
+    panel.unpin();
+    panel.setPosition(649, "auto");
 
     $("#version").change(function(){
         var parentThis = this;
@@ -48,6 +42,7 @@ $(function(){
                     });
                     initEditor(editor);
                     $("#controls").show();
+                    $(".panel-floating").show();
                     $("#loading").hide();
                 }
             }
@@ -57,25 +52,27 @@ $(function(){
  
     function initEditor(editor){       
         editor.on("change",function() {
+            var indicator = $("#valid_indicator .panel-body");
+            indicator.html("<div class='spinner spinner-lg'></div>");
             // Get an array of errors from the validator
             var errors = editor.validate();
-            var indicator = $("#valid_indicator");
             
             // Not valid
             if(errors.length) {
                 var errorStr = "";
                 errors.forEach(function(err){
                     if(!err.message.startsWith("Value must validate against") && !err.message.startsWith("Value must match the pattern") )
-                        errorStr =errorStr + "<li>" + err.message + "(" + editor.getEditor(err.path.replace(/\.oneOf\[\d\]/g,"").substring(0,err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf("."))).header_text + err.path.replace(/\.oneOf\[\d\]/g,"").substring(err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf(".")) + ")</li>";
+                        errorStr =errorStr + "<li>" + err.message + "(" + editor.getEditor(err.path.replace(/\.oneOf\[\d*\]/g,"").substring(0,err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf("."))).header_text + err.path.replace(/\.oneOf\[\d\]/g,"").substring(err.path.replace(/\.oneOf\[\d\]/g,"").lastIndexOf(".")) + ")</li>";
                     });
-                indicator.css("color", "red");
-                indicator.val("Errors: <br><ul>" + errorStr + "</ul>");
+                indicator.css("color", "green");
+                indicator.html(errorStr);
             }
             // Valid
             else {
                 indicator.css("color", "green");
-                indicator.val("valid");
+                indicator.text("valid");
             }
+            $("#loading").hide();
         });
     }
             

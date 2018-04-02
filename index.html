@@ -3,6 +3,7 @@
     <link rel="icon" type="image/png" href="https://www.google.com/s2/favicons?domain=openshift.com"/>
 	<link rel="stylesheet" href="css/patternfly/patternfly.min.css"/>
 	<link rel="stylesheet" href="css/patternfly/patternfly-additions.min.css"/>
+	<link rel="stylesheet" href="css/thirdparty/lobipanel.min.css"/>
 	<link rel="stylesheet" href="css/index.css"/>
 	<meta charset="UTF-8" />
 	<title>Openshift Template Editor</title>
@@ -35,7 +36,15 @@
 		</div>
 	</nav>
 	  
-	<div class="container-fluid">		
+	<div class="container-fluid">	
+		<div id="valid_indicator" class="panel panel-default panel-floating">
+			<div class="panel-heading">
+				<h3 class="panel-title">Validation</h3>
+			</div>
+			<div class="panel-body">
+				
+			</div>
+		</div>	
 		<div class="card-pf-body"> 
 			<div id="valid_indicator" title="Validation"></div>
 			<div>
@@ -74,6 +83,7 @@
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/yamljs/0.3.0/yaml.js"></script>
 	<script type="text/javascript" src="js/thirdparty/bootstrap.min.js"></script>
 	<script type="text/javascript" src="js/thirdparty/jsoneditor.js"></script>
+	<script type="text/javascript" src="js/thirdparty/lobipanel.min.js"></script>
 	<script type="text/javascript" src="js/index.js"></script>
 </body>
 </html>

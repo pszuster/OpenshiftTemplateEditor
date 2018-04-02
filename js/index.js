@@ -20,7 +20,7 @@ $(function(){
         position: {my: "right top", at: "right top", of: window},
         dialogClass: "no-close",
         create: function (event) {
-            $(event.target).parent().css({ "position": "fixed", "right": 50, "top": 150 });
+            $(event.target).parent().css({ "position": "fixed", "right": 50, "top": 300 });
         }
     });
 

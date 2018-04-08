@@ -1294,7 +1294,7 @@ JSONEditor.Validator = Class.extend({
 
       // The no_additional_properties option currently doesn't work with extended schemas that use oneOf or anyOf
       if(typeof schema.additionalProperties === "undefined" && this.jsoneditor.options.no_additional_properties && !schema.oneOf && !schema.anyOf) {
-        schema.additionalProperties = false;
+ //       schema.additionalProperties = false;
       }
 
       // `additionalProperties`

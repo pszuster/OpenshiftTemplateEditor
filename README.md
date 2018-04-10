@@ -5,10 +5,20 @@ This is a simple web editor to create or modify [Red Hat Openshift](http://www.o
 You can import json or yaml templates, modify them and export them as json. The tool also validates the template and indicates found errors. It currently works with Openshift v3.6 and v3.7 schemas.
 
 ## Instructions
-1. Download "index.html".
-2. Open "index.html" in a web browser.
-3. Import an existing template in JSON or YAML (optional).
-4. Start working on the template.
+1. Clone this repo 
+2. Start a webserver to serve static content
+```
+python -m SimpleHTTPServer 8080
+```
+
+or just
+```
+./run.sh
+```
+
+4. Open your browser in http://localhost:8080
+5. Import an existing template in JSON or YAML (optional).
+6. Start working on the template.
 
 
 |**Template Validation** ![Template Validation](images/Selection_021.png)|

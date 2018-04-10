@@ -1,0 +1,51 @@
+#controls{ 
+    margin-top: 15px;
+    display: none;
+}
+
+#version{
+    max-width:90%;
+}
+
+#progressbar {
+    margin-top: 20px;
+}
+.progress-label {
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff;
+}
+.ui-dialog-titlebar-close {
+    display: none;
+}
+.no-close .ui-dialog-titlebar-close {display: none }
+.ui-selectmenu-text { font-size: 15px }
+
+#load-file {
+    display:none;
+}
+
+#dialog-confirm {
+    display: none;
+}
+
+#loading {
+    display: none;
+}
+
+button.btn.btn-default.json-editor-btn-delete.delete {
+    margin: 0 15px;
+}
+
+.well-sm .btn-group{
+    padding-bottom: 10px;
+
+}
+
+button.btn.btn-default {
+    margin-right: 10px;
+    /* padding-right: 10px; */
+}
+
+.panel-floating {
+    display: none;
+}

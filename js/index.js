@@ -160,7 +160,8 @@ $(function(){
 
         var oneOfStr=[];
         schemas.forEach(function(schema){
-            schema.properties.kind.type="string";
+            console.log(schema["x-kubernetes-group-version-kind"][0].kind);
+	    schema.properties.kind.type="string";
             schema.properties.apiVersion.type="string";
             var schemaKind = schema["x-kubernetes-group-version-kind"][0].Kind || schema["x-kubernetes-group-version-kind"][0].kind;
             schema.properties.kind.default = schemaKind;

@@ -504,5 +504,4 @@ volume.json
 volumemount.json
 volumeprojection.json
 vspherevirtualdiskvolumesource.json
-watchevent.json
 weightedpodaffinityterm.json
